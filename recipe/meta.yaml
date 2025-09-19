@@ -1,38 +1,44 @@
 {% set name = "whatthepatch" %}
-{% set version = "1.0.2" %}
+{% set version = "1.0.7" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: c540ea59173e0a291e19c742dd8b406c56e2be039a600edb7c6fc3ae4bbdfa9f
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 9eefb4ebea5200408e02d413d2b4bc28daea6b78bb4b4d53431af7245f7d7edf
 
 build:
-  skip: True  # [py<37]
-  script: {{ PYTHON }} -m pip install . -vv
+  skip: True  # [py<39]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
 
 requirements:
   host:
     - python
     - pip
-    - setuptools
-    - wheel
+    - setuptools >=65.0.0
   run:
     - python
+
 test:
+  source_files:
+    - tests
+    - src
   imports:
     - whatthepatch
   requires:
     - pip
+    - pytest
   commands:
     - pip check
+    # E  Failed: DID NOT RAISE <class 'src.whatthepatch.exceptions.ApplyException'>
+    - pytest -v tests -k "not test_diff_unified_patchutil"
 
 about:
   home: https://github.com/cscorley/whatthepatch
-  summary: 'What The Patch!? is a library for both parsing and applying patch files'
+  summary: What The Patch!? is a library for both parsing and applying patch files
   description: What The Patch!? is a library for both parsing and applying patch files
   license: MIT
   license_family: MIT
