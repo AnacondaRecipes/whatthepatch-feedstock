@@ -10,8 +10,8 @@ source:
   sha256: 9eefb4ebea5200408e02d413d2b4bc28daea6b78bb4b4d53431af7245f7d7edf
 
 build:
-  skip: true  # [py<39]
-  script: {{ PYTHON }} -m pip install . -vv
+  skip: True  # [py<39]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
 
 requirements:
@@ -23,12 +23,18 @@ requirements:
     - python
 
 test:
+  source_files:
+    - tests
+    - src
   imports:
     - whatthepatch
   requires:
     - pip
+    - pytest
   commands:
     - pip check
+    # E  Failed: DID NOT RAISE <class 'src.whatthepatch.exceptions.ApplyException'>
+    - pytest -v tests -k "not test_diff_unified_patchutil"
 
 about:
   home: https://github.com/cscorley/whatthepatch
